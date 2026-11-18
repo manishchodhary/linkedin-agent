@@ -4,8 +4,9 @@ import { LlmAgent } from '@google/adk';
 
 import { getProfileContextTool } from './tools/profile-context.js';
 import { updateProfileTool } from './tools/update-profile.js';
+import { ProfileAwareAgent } from './agents/profile-aware-agent.js';
 
-export const rootAgent = new LlmAgent({
+const assistantAgent = new LlmAgent({
   name: 'linkedin_assistant',
   model: 'gemini-3.5-flash-lite',
   description:
@@ -46,3 +47,5 @@ No LinkedIn account tools are connected. You can manage the local profile with t
 `,
   tools: [getProfileContextTool, updateProfileTool],
 });
+
+export const rootAgent = new ProfileAwareAgent(assistantAgent);
