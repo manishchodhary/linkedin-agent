@@ -8,7 +8,7 @@
     "dev": "adk run src/agent.ts",
     "adk:web": "adk web",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/**/*.test.ts"
+    "test": "tsx --test tests/*.test.ts"
   },
   "dependencies": {
     "@google/adk": "^2.5.0",
