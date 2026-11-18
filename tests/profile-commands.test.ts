@@ -54,3 +54,26 @@ test('does not intercept LinkedIn account changes or vague requests', () => {
   );
   assert.equal(parseProfileCommand('Add Python to my skills.'), null);
 });
+
+test('parses every command in the reported multiline profile batch', () => {
+  const commands = [
+    'Show my complete saved profile.',
+    'Remove React from my saved skills.',
+    'Update my local About section to Backend developer focused on reliable systems.',
+    'Change my saved professional title to Backend Engineer.',
+    'Add target role Platform Engineer to my saved roles.',
+    'Show my complete saved profile.',
+  ].map(parseProfileCommand);
+
+  assert.deepEqual(commands, [
+    { type: 'show' },
+    { type: 'remove-skill', value: 'React' },
+    {
+      type: 'set-about',
+      value: 'Backend developer focused on reliable systems',
+    },
+    { type: 'set-title', value: 'Backend Engineer' },
+    { type: 'add-role', value: 'Platform Engineer' },
+    { type: 'show' },
+  ]);
+});
