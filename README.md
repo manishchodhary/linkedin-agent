@@ -6,7 +6,9 @@ A personal AI assistant for LinkedIn workflows, built with Google Agent Developm
 
 - Generate LinkedIn content grounded in the user's saved professional profile.
 - Retrieve profile sections through a typed ADK tool.
-- Update the local professional profile through a validated ADK tool.
+- Update the local professional profile through validated tools and deterministic command routing.
+- Add or remove saved skills and target roles, update the About summary and professional title, and change public profile links.
+- Display the complete saved profile and verify changes after each write.
 - Persist profile changes in a local JSON file across restarts.
 - Keep local profile changes separate from LinkedIn account changes.
 
@@ -39,10 +41,11 @@ Start the agent:
 npm run dev
 ```
 
-Run TypeScript checks:
+Run TypeScript checks and the profile command tests:
 
 ```bash
 npm run typecheck
+npm test
 ```
 
 ## Profile storage
@@ -61,11 +64,20 @@ Retrieve saved information:
 What skills and target roles are saved in my profile?
 ```
 
-Update the local profile:
+Manage the local profile with explicit requests:
 
 ```text
-Add Python to my skills.
+Add Python to my local saved technical skills.
+Remove React from my saved skills.
+Update my local About section to Backend developer focused on reliable systems.
+Change my saved professional title to Backend Engineer.
+Add target role Platform Engineer to my saved roles.
+Remove target role DevOps from my saved roles.
+Update my saved GitHub link to https://github.com/example.
+Show my complete saved profile.
 ```
+
+The deterministic profile router handles supported, explicitly scoped local profile commands without relying on Gemini to choose a write tool. Requests that target a LinkedIn account are not intercepted. Changes are read back from storage before the agent reports success.
 
 The agent should only save details the user explicitly provides or confirms. The update tool changes the local JSON profile only; it does not edit LinkedIn.
 
@@ -76,6 +88,12 @@ User
  |
 Google ADK Root Agent
  |
+ +-- Profile-aware command router
+ |      |
+ |   Profile Store (read / update / verify)
+ |
+ +-- Gemini conversational agent
+ |      |
  +-- get_profile_context
  |      |
  |   Profile Store
@@ -108,7 +126,9 @@ We are deliberately starting with one agent and a small set of explicit tools. S
 - [x] Zod-validated local profile schema
 - [x] Persistent local profile storage
 - [x] Profile update tool
-- [ ] Profile tool tests and runtime verification
+- [x] Deterministic local profile management commands
+- [x] Profile command parser tests
+- [ ] Runtime verification of profile management commands
 - [ ] Content drafting and review workflow
 - [ ] Research and networking workflows
 - [ ] Opportunity and application tracking
