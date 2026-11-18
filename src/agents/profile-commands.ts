@@ -39,11 +39,11 @@ export function parseProfileCommand(message: string): ProfileCommand | null {
       (value) => ({ type: 'remove-skill', value: cleanValue(value) }),
     ],
     [
-      /\b(?:update|change|set)\s+(?:my\s+)?(?:about(?:\s+section)?|summary)\s+to\s+(.+)$/i,
+      /\b(?:update|change|set)\s+(?:my\s+)?(?:(?:local|saved)\s+)?(?:about(?:\s+section)?|summary)\s+to\s+(.+)$/i,
       (value) => ({ type: 'set-about', value: cleanValue(value) }),
     ],
     [
-      /\b(?:update|change|set)\s+(?:my\s+)?(?:professional\s+title|headline)\s+to\s+(.+)$/i,
+      /\b(?:update|change|set)\s+(?:my\s+)?(?:(?:local|saved)\s+)?(?:professional\s+title|headline)\s+to\s+(.+)$/i,
       (value) => ({ type: 'set-title', value: cleanValue(value) }),
     ],
     [
