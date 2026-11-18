@@ -1,0 +1,25 @@
+export const profile = {
+  fullName: 'Manish Choudhary',
+  professionalTitle: 'Full-Stack and DevOps Developer',
+  about:
+    'Full-Stack and DevOps Developer focused on building backend systems and reliable applications.',
+  skills: [
+    'TypeScript',
+    'Node.js',
+    'React',
+    'PostgreSQL',
+    'Docker',
+    'AWS',
+    'CI/CD',
+  ],
+  targetRoles: [
+    'Full-Stack Development',
+    'Backend Engineering',
+    'DevOps',
+  ],
+  links: {
+    github: 'https://github.com/manishchodhary',
+    portfolio: 'https://manishchodhary-portfolio.vercel.app/',
+    linkedin: 'https://www.linkedin.com/in/manish-choudhary-534441381/',
+  },
+} as const;
