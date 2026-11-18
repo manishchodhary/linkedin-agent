@@ -17,9 +17,6 @@ export const profileUpdateSchema = profileSchema
   .partial()
   .extend({
     links: profileSchema.shape.links.partial().optional(),
-  })
-  .refine((value) => Object.keys(value).length > 0, {
-    message: 'Provide at least one profile field to update.',
   });
 
 export type Profile = z.infer<typeof profileSchema>;
