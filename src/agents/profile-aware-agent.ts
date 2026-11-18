@@ -2,16 +2,7 @@ import { BaseAgent, InvocationContext, LlmAgent } from '@google/adk';
 import type { Event } from '@google/adk';
 
 import { getProfile, updateProfile } from '../data/profile-store.js';
-
-function extractLocalSkillAddition(message: string): string | null {
-  if (!/\b(?:local|saved)\b/i.test(message)) return null;
-
-  const match = message.match(
-    /\b(?:add|include|append)\s+(?:the\s+skill\s+)?["']?([a-z0-9+#./ -]+?)["']?\s+(?:to|into)\s+(?:my\s+)?(?:(?:local|saved)\s+)*(?:technical\s+)?skills\b/i,
-  );
-
-  return match?.[1]?.trim().replace(/[.!?,;]+$/, '') || null;
-}
+import { parseProfileCommand } from './profile-commands.js';
 
 export class ProfileAwareAgent extends BaseAgent {
   private readonly assistant: LlmAgent;
@@ -20,7 +11,7 @@ export class ProfileAwareAgent extends BaseAgent {
     super({
       name: 'profile_aware_router',
       description:
-        'Routes explicit local profile skill additions through deterministic application logic and delegates other requests to the conversational assistant.',
+        'Handles explicit local profile management commands deterministically and delegates other requests to Gemini.',
       subAgents: [assistant],
     });
 
@@ -35,35 +26,116 @@ export class ProfileAwareAgent extends BaseAgent {
       .join(' ')
       .trim();
 
-    const skillToAdd = extractLocalSkillAddition(message);
+    const command = parseProfileCommand(message);
 
-    if (skillToAdd) {
-      const currentProfile = await getProfile();
-      const alreadyExists = currentProfile.skills.some(
-        (skill) => skill.toLowerCase() === skillToAdd.toLowerCase(),
-      );
+    if (command) {
+      const profile = await getProfile();
+      let resultMessage = '';
 
-      if (!alreadyExists) {
-        await updateProfile({
-          skills: [...currentProfile.skills, skillToAdd],
-        });
+      switch (command.type) {
+        case 'show':
+          resultMessage = [
+            `Name: ${profile.fullName}`,
+            `Professional title: ${profile.professionalTitle}`,
+            `About: ${profile.about}`,
+            `Skills: ${profile.skills.join(', ')}`,
+            `Target roles: ${profile.targetRoles.join(', ')}`,
+            `GitHub: ${profile.links.github}`,
+            `Portfolio: ${profile.links.portfolio}`,
+            `LinkedIn: ${profile.links.linkedin}`,
+          ].join('\n');
+          break;
+
+        case 'add-skill': {
+          const exists = profile.skills.some(
+            (item) => item.toLowerCase() === command.value.toLowerCase(),
+          );
+          if (!exists) {
+            await updateProfile({ skills: [...profile.skills, command.value] });
+          }
+          resultMessage = exists
+            ? `"${command.value}" is already in your saved skills.`
+            : `Added "${command.value}" to your saved skills.`;
+          break;
+        }
+
+        case 'remove-skill': {
+          const next = profile.skills.filter(
+            (item) => item.toLowerCase() !== command.value.toLowerCase(),
+          );
+          if (next.length === profile.skills.length) {
+            resultMessage = `"${command.value}" was not found in your saved skills. No changes made.`;
+          } else {
+            await updateProfile({ skills: next });
+            resultMessage = `Removed "${command.value}" from your saved skills.`;
+          }
+          break;
+        }
+
+        case 'set-about':
+          await updateProfile({ about: command.value });
+          resultMessage = 'Updated your saved About summary.';
+          break;
+
+        case 'set-title':
+          await updateProfile({ professionalTitle: command.value });
+          resultMessage = 'Updated your saved professional title.';
+          break;
+
+        case 'add-role': {
+          const exists = profile.targetRoles.some(
+            (item) => item.toLowerCase() === command.value.toLowerCase(),
+          );
+          if (!exists) {
+            await updateProfile({
+              targetRoles: [...profile.targetRoles, command.value],
+            });
+          }
+          resultMessage = exists
+            ? `"${command.value}" is already in your saved target roles.`
+            : `Added "${command.value}" to your saved target roles.`;
+          break;
+        }
+
+        case 'remove-role': {
+          const next = profile.targetRoles.filter(
+            (item) => item.toLowerCase() !== command.value.toLowerCase(),
+          );
+          if (next.length === profile.targetRoles.length) {
+            resultMessage = `"${command.value}" was not found in your saved target roles. No changes made.`;
+          } else {
+            await updateProfile({ targetRoles: next });
+            resultMessage = `Removed "${command.value}" from your saved target roles.`;
+          }
+          break;
+        }
+
+        case 'set-link': {
+          try {
+            new URL(command.value);
+          } catch {
+            resultMessage = 'That link is not a valid URL. No changes made.';
+            break;
+          }
+          await updateProfile({
+            links: { [command.field]: command.value },
+          });
+          resultMessage = `Updated your saved ${command.field} link.`;
+          break;
+        }
       }
 
-      const verifiedProfile = await getProfile();
-      const status = alreadyExists
-        ? `${skillToAdd} was already in your saved skills.`
-        : `${skillToAdd} was added to your local saved profile.`;
+      const verified = await getProfile();
+      const verification = command.type === 'show'
+        ? ''
+        : `\n\nVerified saved profile:\nSkills: ${verified.skills.join(', ')}\nTarget roles: ${verified.targetRoles.join(', ')}\nProfessional title: ${verified.professionalTitle}\nAbout: ${verified.about}`;
 
       yield {
         author: this.name,
         invocationId: context.invocationId,
         content: {
           role: 'model',
-          parts: [
-            {
-              text: `${status}\n\nVerified saved skills: ${verifiedProfile.skills.join(', ')}`,
-            },
-          ],
+          parts: [{ text: `${resultMessage}${verification}` }],
         },
       };
       return;
