@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import 'dotenv/config';
 
 import { saveCompanyResearch } from '../data/company-research-store.js';
 
