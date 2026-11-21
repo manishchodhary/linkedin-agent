@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { LlmAgent, GOOGLE_SEARCH } from '@google/adk';
+import { LlmAgent, AgentTool, GOOGLE_SEARCH } from '@google/adk';
 
 import { getProfileContextTool } from './tools/profile-context.js';
 import { updateProfileTool } from './tools/update-profile.js';
@@ -16,6 +16,18 @@ import {
   getCompanyResearchTool,
 } from './tools/company-research.js';
 import { ProfileAwareAgent } from './agents/profile-aware-agent.js';
+
+const companyResearchSearchAgent = new LlmAgent({
+  name: 'company_research_search_agent',
+  model: 'gemini-3.5-flash-lite',
+  description: 'Researches companies and internship opportunities using Google Search.',
+  instruction: `
+You are a dedicated web research agent. Use Google Search grounding for all company and internship research requests.
+Search multiple queries: official company details, internship posting, fee/course/training requirements, independent reviews/complaints, and evidence of actual product or engineering work.
+Return findings with source URLs and clearly label facts, company claims, and unverified information. Never infer that a company is fraudulent without evidence. If you cannot find evidence, say so explicitly.
+`,
+  tools: [GOOGLE_SEARCH],
+});
 
 const assistantAgent = new LlmAgent({
   name: 'linkedin_assistant',
