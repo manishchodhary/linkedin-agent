@@ -1,10 +1,11 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 
 import { profileSchema, type Profile, type ProfileUpdate } from './profile.schema.js';
 
-const profilePath = fileURLToPath(new URL('../../data/profile.json', import.meta.url));
-const defaultProfilePath = new URL('./profile.default.json', import.meta.url);
+const projectRoot = process.cwd();
+const profilePath = resolve(projectRoot, 'data/profile.json');
+const defaultProfilePath = resolve(projectRoot, 'src/data/profile.default.json');
 
 async function readDefaultProfile(): Promise<Profile> {
   const content = await readFile(defaultProfilePath, 'utf8');
@@ -27,10 +28,10 @@ export async function getProfile(): Promise<Profile> {
 }
 
 async function saveProfile(profile: Profile): Promise<void> {
-  await mkdir(new URL('../../data/', import.meta.url), { recursive: true });
+  await mkdir(resolve(projectRoot, 'data'), { recursive: true });
 
   const temporaryPath = `${profilePath}.${process.pid}.tmp`;
-  await writeFile(temporaryPath, `${JSON.stringify(profile, null, 2)}\n`, {
+  await writeFile(temporaryPath, `${JSON.stringify(profile, null, 2)}\\n`, {
     encoding: 'utf8',
     mode: 0o600,
   });
