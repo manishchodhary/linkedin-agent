@@ -97,13 +97,16 @@ The matcher prints a 0–100 fit score, an Apply / Maybe / Skip recommendation, 
 
 ### Standalone research command (no Gemini quota required)
 
-The research CLI calls the Serper.dev Google Search API directly from Node.js, without an LLM request. You need a Serper API key (check its current free-tier limits and terms on its website) and add `SERPER_API_KEY=your_key` to your local `.env`. It runs five searches covering company presence, internships, fees/training, complaints, and products/engineering. It prints titles, URLs, and snippets, and saves the search leads locally as an `insufficient_evidence` report. Snippets are leads, not verification; open sources before making a verdict.
+The research CLI calls the Serper.dev Google Search API directly from Node.js, without an LLM request. You need a Serper API key (check its current free-tier limits and terms on its website) and add `SERPER_API_KEY=your_key` to your local `.env`. Smart mode uses one broad query by default. Deep mode (`--deep`) runs up to three queries covering company presence, internship fee/training signals, and products/engineering. Research results are cached for 30 days by default (`COMPANY_RESEARCH_CACHE_DAYS` overrides this), so repeat research for the same company costs zero queries while the cache is fresh. A local usage tracker records total, successful, and failed query attempts.
 
 ```bash
-npm run research -- "Cuvette"
+npm run research -- "Cuvette"                 # smart: 1 query
+npm run research -- "Cuvette" --deep        # deep: up to 3 queries
+npm run research -- "Cuvette" --force       # bypass cache and refresh (1 query)
+npm run research -- --usage                   # usage tracker
 ```
 
-Search results are Google-indexed result leads returned by Serper JSON; snippets are not proof. If the API returns an error, the CLI prints the status and does not invent a verdict. Keep your key private; never commit `.env`.
+`--force` bypasses cache; use it only when you want fresh results. Search results are Google-indexed leads returned by Serper JSON; snippets are not proof. If the API returns an error, the CLI prints the status and does not invent a verdict. Keep your key private; never commit `.env`. The usage file is `data/research-usage.json` and is local/ignored.
 
 ### Company and internship research
 
