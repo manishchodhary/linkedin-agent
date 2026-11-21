@@ -14,11 +14,16 @@ export const opportunityStatusSchema = z.enum([
   'offer',
 ]);
 
+const httpUrlSchema = z.string().url().refine((value) => {
+  const protocol = new URL(value).protocol;
+  return protocol === 'http:' || protocol === 'https:';
+}, 'URL must use http or https');
+
 export const opportunitySchema = z.object({
   id: z.string().uuid(),
   title: z.string().min(1),
   company: z.string().min(1),
-  url: z.string().url().optional(),
+  url: httpUrlSchema.optional(),
   location: z.string().optional(),
   status: opportunityStatusSchema.default('saved'),
   notes: z.string().default(''),
@@ -32,7 +37,7 @@ export const contactSchema = z.object({
   name: z.string().min(1),
   company: z.string().optional(),
   role: z.string().optional(),
-  linkedinUrl: z.string().url().optional(),
+  linkedinUrl: httpUrlSchema.optional(),
   notes: z.string().default(''),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -65,6 +70,9 @@ async function writeArray<T>(path: string, items: T[]): Promise<void> {
 
 function normalizeUrl(url: string): string {
   const parsed = new URL(url);
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new Error('URL must use http or https.');
+  }
   parsed.hash = '';
   parsed.hostname = parsed.hostname.toLowerCase();
   return parsed.toString().replace(/\/$/, '');
