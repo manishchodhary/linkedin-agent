@@ -99,7 +99,7 @@ async function main() {
   console.log(`\nSaved search-lead report locally. Report ID: ${report.id}`);
 }
 
-main().catch((error) => {
+if (process.argv[1]?.endsWith('/src/research/cli.ts')) {\nmain().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
