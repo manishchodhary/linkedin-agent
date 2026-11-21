@@ -84,13 +84,13 @@ The agent should only save details the user explicitly provides or confirms. The
 
 ### Standalone research command (no Gemini quota required)
 
-The research CLI fetches DuckDuckGo HTML search results directly from Node.js, without an LLM request. It runs five searches covering company presence, internships, fees/training, complaints, and products/engineering. It prints titles, URLs, and snippets, and saves the search leads locally as an `insufficient_evidence` report. Snippets are leads, not verification; open sources before making a verdict.
+The research CLI calls the Serper.dev Google Search API directly from Node.js, without an LLM request. You need a Serper API key (check its current free-tier limits and terms on its website) and add `SERPER_API_KEY=your_key` to your local `.env`. It runs five searches covering company presence, internships, fees/training, complaints, and products/engineering. It prints titles, URLs, and snippets, and saves the search leads locally as an `insufficient_evidence` report. Snippets are leads, not verification; open sources before making a verdict.
 
 ```bash
 npm run research -- "Cuvette"
 ```
 
-This is a lightweight HTML search integration and may fail if DuckDuckGo blocks requests or changes markup.
+Search results are Google-indexed result leads returned by Serper JSON; snippets are not proof. If the API returns an error, the CLI prints the status and does not invent a verdict. Keep your key private; never commit `.env`.
 
 ### Company and internship research
 
