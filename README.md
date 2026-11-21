@@ -11,7 +11,9 @@ A personal AI assistant for LinkedIn workflows, built with Google Agent Developm
 - Display the complete saved profile and verify changes after each write.
 - Persist profile changes in a local JSON file across restarts.
 - Keep local profile changes separate from LinkedIn account changes.
-- Save, list, retrieve, and mark locally persisted content drafts as reviewed; drafts remain unpublished.\n- Save and retrieve company/internship verification reports with evidence links, risk flags, confidence, and a cautious verdict.\n- Standalone direct web search for company research that runs without Gemini quota.
+- Save, list, retrieve, and mark locally persisted content drafts as reviewed; drafts remain unpublished.
+- Save and retrieve company/internship verification reports with evidence links, risk flags, confidence, and a cautious verdict.
+- Standalone direct web search for company research that runs without Gemini quota.
 
 ## Technology
 
@@ -81,6 +83,17 @@ Show my complete saved profile.
 The deterministic profile router handles supported, explicitly scoped local profile commands without relying on Gemini to choose a write tool. Requests that target a LinkedIn account are not intercepted. Changes are read back from storage before the agent reports success.
 
 The agent should only save details the user explicitly provides or confirms. The update tool changes the local JSON profile only; it does not edit LinkedIn.
+
+
+### Local opportunity matcher (no Gemini or search API required)
+
+Compare a job or internship description against the saved local profile. Put the description in a text file, then run:
+
+```bash
+npm run match -- ./opportunity.txt
+```
+
+The matcher prints a 0–100 fit score, an Apply / Maybe / Skip recommendation, detected role categories, skills found in the posting that are already in your profile, and recognized posting skills that are not listed in your profile. It reads `data/profile.json` and the opportunity text locally; it makes no network or model calls. The score is a heuristic, not a hiring prediction. Skills are recognized from a built-in keyword list, so unrecognized tools/terms are not counted.
 
 ### Standalone research command (no Gemini quota required)
 
@@ -170,7 +183,8 @@ We are deliberately starting with one agent and a small set of explicit tools. S
 - [x] Profile command parser tests
 - [ ] Runtime verification of profile management commands
 - [x] Content drafting and local review workflow
-- [x] Company/internship research report storage and tools\n- [ ] Research and networking workflows
+- [x] Company/internship research report storage and tools
+- [ ] Research and networking workflows
 - [ ] Opportunity and application tracking
 - [ ] LinkedIn OAuth and permitted API integration
 - [ ] Dashboard, observability, and deployment
