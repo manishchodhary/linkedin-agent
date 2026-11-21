@@ -106,7 +106,7 @@ async function main() {
   }
 
   console.log(`Company research: ${company}\nMode: ${deep ? 'Deep (up to 3 queries)' : 'Smart (1 query)'}\nCache: ${CACHE_DAYS} days\n`);
-  if (!force) {
+  if (!force && !deep) {
     const existing = await listCompanyResearch();
     const cached = existing.find((report) => report.companyName.trim().toLowerCase() === company.toLowerCase() && isFresh(report.researchedAt));
     if (cached) {
