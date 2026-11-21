@@ -61,7 +61,7 @@ export function parseProfileCommand(message: string): ProfileCommand | null {
         return {
           type: 'set-link',
           field: match[1].toLowerCase() as keyof Profile['links'],
-          value: cleanValue(value),
+          value: cleanValue(match[2]),
         };
       },
     ],
