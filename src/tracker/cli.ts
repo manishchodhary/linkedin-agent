@@ -29,11 +29,28 @@ async function promptFields(fields: Array<[string, boolean]>): Promise<Record<st
   const result: Record<string, string> = {};
   try {
     for (const [key, required] of fields) {
-      const value = (await rl.question(`${key}${required ? ' (required)' : ''}: `)).trim();
-      if (required && !value) {
-        throw new Error(`${key} is required.`);
+      while (true) {
+        const value = (await rl.question(`${key}${required ? ' (required)' : ''}: `)).trim();
+        if (required && !value) {
+          console.log(`${key} is required. Please try again.`);
+          continue;
+        }
+        if (value && (key === 'Job URL' || key === 'LinkedIn URL')) {
+          let valid = false;
+          try {
+            const parsed = new URL(value);
+            valid = parsed.protocol === 'http:' || parsed.protocol === 'https:';
+          } catch {
+            valid = false;
+          }
+          if (!valid) {
+            console.log('Please enter a valid URL beginning with http:// or https://, or leave blank.');
+            continue;
+          }
+        }
+        result[key] = value;
+        break;
       }
-      result[key] = value;
     }
   } finally {
     rl.close();
