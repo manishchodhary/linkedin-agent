@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import 'dotenv/config';
 
 import { saveCompanyResearch } from '../data/company-research-store.js';
 
@@ -20,8 +19,7 @@ export function parseSerperResults(payload: unknown): SearchResult[] {
   return organic.flatMap((item): SearchResult[] => {
     if (!item || typeof item !== 'object') return [];
     const row = item as Record<string, unknown>;
-    if (typeof row.title !== 'string' || typeof row.link !== 'string') return [];
-    if (!row.link.startsWith('http')) return [];
+    if (typeof row.title !== 'string' || typeof row.link !== 'string' || !row.link.startsWith('http')) return [];
     return [{
       title: row.title,
       url: row.link,
@@ -34,10 +32,7 @@ export function parseSerperResults(payload: unknown): SearchResult[] {
 async function search(query: string, apiKey: string): Promise<SearchResult[]> {
   const response = await fetch('https://google.serper.dev/search', {
     method: 'POST',
-    headers: {
-      'X-API-KEY': apiKey,
-      'Content-Type': 'application/json',
-    },
+    headers: { 'X-API-KEY': apiKey, 'Content-Type': 'application/json' },
     body: JSON.stringify({ q: query, num: 10, gl: 'in', hl: 'en' }),
     signal: AbortSignal.timeout(20000),
   });
@@ -57,7 +52,7 @@ async function main() {
   }
   const apiKey = process.env.SERPER_API_KEY?.trim();
   if (!apiKey) {
-    console.error('SERPER_API_KEY is missing. Create a Serper.dev account, copy your API key, and add SERPER_API_KEY=... to your local .env file. See README research setup.');
+    console.error('SERPER_API_KEY is missing. Add it to your local .env. See README research setup.');
     process.exitCode = 1;
     return;
   }
@@ -90,17 +85,19 @@ async function main() {
 
   const report = await saveCompanyResearch({
     companyName: company,
-    summary: `Standalone Serper web search collected ${results.length} result(s) across company profile, internship, fees, reviews, and products/engineering queries. Search snippets are leads and have not been verified by opening source pages.`,
+    summary: `Standalone Serper search collected ${results.length} result(s). Snippets are leads and have not been verified by opening source pages.`,
     evidence: results.map((result) => ({ sourceUrl: result.url, note: `Search result: ${result.title}. Snippet: ${result.snippet || 'No snippet.'}${result.date ? ` Date: ${result.date}.` : ''}` })),
     riskFlags: ['unverified_claims'],
     verdict: 'insufficient_evidence',
-    recommendation: 'Open and verify each source before reaching a conclusion. Search snippets alone are insufficient to confirm legitimacy, fee requirements, or accusations.',
+    recommendation: 'Open and verify sources before conclusions. Search snippets alone cannot confirm legitimacy or fee requirements.',
     confidence: 'low',
   });
   console.log(`\nSaved search-lead report locally. Report ID: ${report.id}`);
 }
 
-if (process.argv[1]?.endsWith('/src/research/cli.ts')) {\nmain().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+if (process.argv[1]?.endsWith('/src/research/cli.ts')) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}
