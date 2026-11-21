@@ -20,22 +20,23 @@ function decodeHtml(value: string): string {
     .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)));
 }
 
-function extractResults(html: string): SearchResult[] {
+export function extractResults(html: string): SearchResult[] {
   const results: SearchResult[] = [];
-  const blocks = html.match(/<div class="result[^"]*"[^>]*>[\s\S]*?<\/div>\s*<\/div>/g) ?? [];
-  for (const block of blocks) {
-    const linkMatch = block.match(/<a[^>]+class="result__a"[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/);
-    const snippetMatch = block.match(/<a[^>]+class="result__snippet"[^>]*>([\s\S]*?)<\/a>|<div[^>]+class="result__snippet"[^>]*>([\s\S]*?)<\/div>/);
-    if (!linkMatch) continue;
-    let url = decodeHtml(linkMatch[1]);
+  const resultAnchors = [...html.matchAll(/<a(?=[^>]*class="[^"]*result__a")[^>]*>([\\s\\S]*?)<\\/a>/g)];
+  const snippetAnchors = [...html.matchAll(/<a(?=[^>]*class="[^"]*result__snippet")[^>]*>([\\s\\S]*?)<\\/a>|<div(?=[^>]*class="[^"]*result__snippet")[^>]*>([\\s\\S]*?)<\\/div>/g)];
+  for (let i = 0; i < resultAnchors.length; i++) {
+    const match = resultAnchors[i];
+    const href = match[0].match(/href="([^"]+)"/)?.[1];
+    if (!href) continue;
+    let url = decodeHtml(href);
     try {
       const parsed = new URL(url);
       const redirect = parsed.searchParams.get('uddg');
       if (redirect) url = redirect;
     } catch { continue; }
     if (!url.startsWith('http')) continue;
-    const title = decodeHtml(linkMatch[2].replace(/<[^>]+>/g, '').trim());
-    const snippet = decodeHtml((snippetMatch?.[1] ?? snippetMatch?.[2] ?? '').replace(/<[^>]+>/g, '').trim());
+    const title = decodeHtml(match[1].replace(/<[^>]+>/g, '').trim());
+    const snippet = decodeHtml((snippetAnchors[i]?.[1] ?? snippetAnchors[i]?.[2] ?? '').replace(/<[^>]+>/g, '').trim());
     results.push({ title, url, snippet });
   }
   return results;
