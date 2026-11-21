@@ -1,19 +1,26 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { extractResults } from '../src/research/cli.js';
+import { parseSerperResults } from '../src/research/cli.js';
 
-test('extractResults parses search titles, redirect URLs, and snippets', () => {
-  const html = `
-    <a class="result__a" href="https://duckduckgo.com/l/?uddg=https%3A%2F%2Fexample.com%2Fjob&amp;rut=x">Backend Internship &amp; Hiring</a>
-    <a class="result__snippet" href="https://example.com/job">Training fees are <b>required</b> for this program.</a>
-    <a class="result__a" href="https://example.org/about">Company About</a>
-    <a class="result__snippet" href="https://example.org/about">Builds software products and services.</a>
-  `;
-  const results = extractResults(html);
+test('parseSerperResults extracts organic Google results from Serper payload', () => {
+  const results = parseSerperResults({
+    organic: [
+      { title: 'Internship program', link: 'https://example.com/intern', snippet: 'Fee information in the listing', date: 'Nov 2026' },
+      { title: 'Company About', link: 'https://example.org/about' },
+      { title: 'Malformed row', link: 'not-a-url' },
+      null,
+    ],
+  });
   assert.equal(results.length, 2);
-  assert.equal(results[0].url, 'https://example.com/job');
-  assert.equal(results[0].title, 'Backend Internship & Hiring');
-  assert.match(results[0].snippet, /Training fees are required/);
-  assert.equal(results[1].url, 'https://example.org/about');
+  assert.equal(results[0].title, 'Internship program');
+  assert.equal(results[0].url, 'https://example.com/intern');
+  assert.equal(results[0].snippet, 'Fee information in the listing');
+  assert.equal(results[0].date, 'Nov 2026');
+  assert.equal(results[1].snippet, '');
+});
+
+test('parseSerperResults handles missing organic results', () => {
+  assert.deepEqual(parseSerperResults({}), []);
+  assert.deepEqual(parseSerperResults(null), []);
 });
