@@ -29,6 +29,15 @@ export function parseProfileCommand(message: string): ProfileCommand | null {
     return { type: 'show' };
   }
 
+  const linkMatch = input.match(/\\b(?:update|change|set)\\s+(?:my\\s+)?(?:(?:local|saved)\\s+)?(github|portfolio|linkedin)\\s+(?:link|url)\\s+to\\s+(https?:\\/\\/\\S+)/i);
+  if (linkMatch) {
+    return {
+      type: 'set-link',
+      field: linkMatch[1].toLowerCase() as keyof Profile['links'],
+      value: cleanValue(linkMatch[2]),
+    };
+  }
+
   const patterns: Array<[RegExp, (value: string) => ProfileCommand]> = [
     [
       /\b(?:add|include|append)\s+(?:the\s+skill\s+)?["“]?(.+?)["”]?\s+(?:to|into)\s+(?:my\s+)?(?:(?:local|saved)\s+)*(?:technical\s+)?skills\b/i,
