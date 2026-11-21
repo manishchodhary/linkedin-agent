@@ -9,7 +9,8 @@
     "adk:web": "adk web",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
-    "research": "tsx src/research/cli.ts"
+    "research": "tsx src/research/cli.ts",
+    "match": "tsx src/matching/cli.ts"
   },
   "dependencies": {
     "@google/adk": "^2.5.0",
