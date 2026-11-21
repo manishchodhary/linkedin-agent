@@ -11,7 +11,7 @@ A personal AI assistant for LinkedIn workflows, built with Google Agent Developm
 - Display the complete saved profile and verify changes after each write.
 - Persist profile changes in a local JSON file across restarts.
 - Keep local profile changes separate from LinkedIn account changes.
-- Save, list, retrieve, and mark locally persisted content drafts as reviewed; drafts remain unpublished.\n- Save and retrieve company/internship verification reports with evidence links, risk flags, confidence, and a cautious verdict.
+- Save, list, retrieve, and mark locally persisted content drafts as reviewed; drafts remain unpublished.\n- Save and retrieve company/internship verification reports with evidence links, risk flags, confidence, and a cautious verdict.\n- Standalone direct web search for company research that runs without Gemini quota.
 
 ## Technology
 
@@ -81,6 +81,16 @@ Show my complete saved profile.
 The deterministic profile router handles supported, explicitly scoped local profile commands without relying on Gemini to choose a write tool. Requests that target a LinkedIn account are not intercepted. Changes are read back from storage before the agent reports success.
 
 The agent should only save details the user explicitly provides or confirms. The update tool changes the local JSON profile only; it does not edit LinkedIn.
+
+### Standalone research command (no Gemini quota required)
+
+The research CLI fetches DuckDuckGo HTML search results directly from Node.js, without an LLM request. It runs five searches covering company presence, internships, fees/training, complaints, and products/engineering. It prints titles, URLs, and snippets, and saves the search leads locally as an `insufficient_evidence` report. Snippets are leads, not verification; open sources before making a verdict.
+
+```bash
+npm run research -- "Cuvette"
+```
+
+This is a lightweight HTML search integration and may fail if DuckDuckGo blocks requests or changes markup.
 
 ### Company and internship research
 
