@@ -124,7 +124,7 @@ async function main() {
     return;
   }
 
-  const queries = [smartQuery(company), ...(deep ? deepQueries(company) : [])];
+  const queries = researchQueryPlan(company, deep);
   const unique = new Map<string, SearchResult>();
   let failedQueries = 0;
   for (const query of queries) {
