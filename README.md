@@ -84,7 +84,7 @@ The agent should only save details the user explicitly provides or confirms. The
 
 ### Company and internship research
 
-Research a company or internship before applying. Where browsing is available, verify official company information, opportunity details, independent reputation signals, whether fees are required, whether the business primarily sells training/courses, and whether internship tasks appear concrete. Include evidence links and separate verified facts from unknowns; absence of evidence is not proof of fraud.
+Research a company or internship before applying. The agent is equipped with Google Search grounding for current web research. Check official company information, opportunity details, independent reputation signals, whether fees are required, whether the business primarily sells training/courses, and whether internship tasks appear concrete. Cite source URLs in the report. Include evidence links and separate verified facts from unknowns; absence of evidence is not proof of fraud.
 
 Verdicts are risk-based: `worth_applying`, `needs_verification`, `high_risk_avoid`, or `insufficient_evidence`. Reports are saved locally to `data/company-research.json` (gitignored).
 
