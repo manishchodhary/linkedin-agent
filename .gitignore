@@ -10,4 +10,6 @@ coverage/
 /data/*.tmp
 /data/drafts.json
 /data/company-research.json
-\n/data/opportunities.json\n/data/contacts.json\n
+
+/data/opportunities.json
+/data/contacts.json
