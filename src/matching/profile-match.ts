@@ -13,7 +13,7 @@ export type MatchReport = {
 
 const skillCatalog: Array<{ label: string; aliases: string[] }> = [
   { label: 'TypeScript', aliases: ['typescript'] },
-  { label: 'JavaScript', aliases: ['javascript', 'js'] },
+  { label: 'JavaScript', aliases: ['javascript'] },
   { label: 'Node.js', aliases: ['node.js', 'nodejs', 'node'] },
   { label: 'React', aliases: ['react', 'react.js', 'reactjs'] },
   { label: 'Next.js', aliases: ['next.js', 'nextjs'] },
