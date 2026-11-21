@@ -12,11 +12,15 @@ const usagePath = resolve(dataDir, 'research-usage.json');
 const CACHE_DAYS = Number(process.env.COMPANY_RESEARCH_CACHE_DAYS ?? 30);
 const QUERY_BUDGET = Number(process.env.SERPER_QUERY_BUDGET ?? 2500);
 
-const smartQuery = (company: string) => `${company} company official website software internship jobs reviews`;
-const deepQueries = (company: string) => [
-  `${company} internship fees registration training complaints`,
-  `${company} products services engineering team`,
-];
+export function researchQueryPlan(company: string, deep = false): string[] {
+  const smart = `${company} company official website software internship jobs reviews`;
+  if (!deep) return [smart];
+  return [
+    smart,
+    `${company} internship fees registration training complaints`,
+    `${company} products services engineering team`,
+  ];
+}
 
 export function parseSerperResults(payload: unknown): SearchResult[] {
   if (!payload || typeof payload !== 'object') return [];
