@@ -41,3 +41,9 @@ test('recognizes DevOps aliases and CI/CD terminology', () => {
   assert.deepEqual(report.matchedSkills, ['AWS', 'CI/CD']);
   assert.deepEqual(report.missingSkills, ['Kubernetes']);
 });
+
+test('does not mistake common word jobs for JavaScript alias', () => {
+  const report = matchOpportunity(profile, 'Backend internship. Jobs are available for motivated students.');
+  assert.deepEqual(report.matchedSkills, []);
+  assert.deepEqual(report.missingSkills, []);
+});
