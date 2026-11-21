@@ -9,3 +9,4 @@ coverage/
 /data/profile.json
 /data/*.tmp
 /data/drafts.json
+/data/company-research.json
