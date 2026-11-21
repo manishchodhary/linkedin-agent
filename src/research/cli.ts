@@ -9,7 +9,7 @@ type Usage = { totalQueries: number; successfulQueries: number; failedQueries: n
 
 const dataDir = process.env.LINKEDIN_AGENT_DATA_DIR ?? resolve(process.cwd(), 'data');
 const usagePath = resolve(dataDir, 'research-usage.json');
-const CACHE_DAYS = Number(process.env.COMPANY_RESEARCH_CACHE_DAYS ?? 30);
+const CACHE_DAYS = Number(process.env.COMPANY_RESEARCH_CACHE_DAYS ?? 30);\nconst QUERY_BUDGET = Number(process.env.SERPER_QUERY_BUDGET ?? 2500);
 
 const smartQuery = (company: string) => `${company} company official website software internship jobs reviews`;
 const deepQueries = (company: string) => [
