@@ -22,8 +22,8 @@ function decodeHtml(value: string): string {
 
 export function extractResults(html: string): SearchResult[] {
   const results: SearchResult[] = [];
-  const resultAnchors = [...html.matchAll(/<a(?=[^>]*class="[^"]*result__a")[^>]*>([\\s\\S]*?)<\\/a>/g)];
-  const snippetAnchors = [...html.matchAll(/<a(?=[^>]*class="[^"]*result__snippet")[^>]*>([\\s\\S]*?)<\\/a>|<div(?=[^>]*class="[^"]*result__snippet")[^>]*>([\\s\\S]*?)<\\/div>/g)];
+  const resultAnchors = [...html.matchAll(/<a(?=[^>]*class="[^"]*result__a")[^>]*>([\s\S]*?)<\/a>/g)];
+  const snippetAnchors = [...html.matchAll(/<a(?=[^>]*class="[^"]*result__snippet")[^>]*>([\s\S]*?)<\/a>|<div(?=[^>]*class="[^"]*result__snippet")[^>]*>([\s\S]*?)<\/div>/g)];
   for (let i = 0; i < resultAnchors.length; i++) {
     const match = resultAnchors[i];
     const href = match[0].match(/href="([^"]+)"/)?.[1];
@@ -33,7 +33,9 @@ export function extractResults(html: string): SearchResult[] {
       const parsed = new URL(url);
       const redirect = parsed.searchParams.get('uddg');
       if (redirect) url = redirect;
-    } catch { continue; }
+    } catch {
+      continue;
+    }
     if (!url.startsWith('http')) continue;
     const title = decodeHtml(match[1].replace(/<[^>]+>/g, '').trim());
     const snippet = decodeHtml((snippetAnchors[i]?.[1] ?? snippetAnchors[i]?.[2] ?? '').replace(/<[^>]+>/g, '').trim());
@@ -96,7 +98,9 @@ async function main() {
   console.log(`\nSaved raw search-lead report locally. Report ID: ${report.id}`);
 }
 
-if (process.argv[1]?.endsWith('/src/research/cli.ts')) {\nmain().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+if (process.argv[1]?.endsWith('/src/research/cli.ts')) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}
