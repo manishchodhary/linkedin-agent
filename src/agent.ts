@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { LlmAgent, AgentTool, GOOGLE_SEARCH } from '@google/adk';
+import { LlmAgent } from '@google/adk';
 
 import { getProfileContextTool } from './tools/profile-context.js';
 import { updateProfileTool } from './tools/update-profile.js';
@@ -16,22 +16,6 @@ import {
   getCompanyResearchTool,
 } from './tools/company-research.js';
 import { ProfileAwareAgent } from './agents/profile-aware-agent.js';
-
-const companyResearchSearchAgent = new LlmAgent({
-  name: 'company_research_search_agent',
-  model: 'gemini-3.5-flash-lite',
-  description: 'Dedicated current-web researcher for company and internship verification.',
-  instruction: `
-Use Google Search for every company/internship research request. Search several distinct angles:
-1. Official company website and company background.
-2. Exact internship/opportunity listing and task descriptions.
-3. Fees, training/course purchases, certificates, registration charges, placement promises.
-4. Independent reviews, complaints, Reddit/community reports, news, and reputation.
-5. Evidence that the company builds products/services or employs engineering teams.
-Provide source titles and direct URLs for findings. Separate verified source statements, allegations/reviews, and unknowns. Do not label a company scam without reliable evidence. Return a concise research report with sources.
-`,
-  tools: [GOOGLE_SEARCH],
-});
 
 const assistantAgent = new LlmAgent({
   name: 'linkedin_assistant',
@@ -80,7 +64,6 @@ Professional accuracy and external actions:
 No LinkedIn account tools are connected. You can manage the local profile with the provided tools, but cannot access or modify the user's LinkedIn account.
 `,
   tools: [
-    new AgentTool({ agent: companyResearchSearchAgent, propagateGroundingMetadata: true }),
     getProfileContextTool,
     updateProfileTool,
     saveContentDraftTool,
