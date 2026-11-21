@@ -11,7 +11,7 @@ A personal AI assistant for LinkedIn workflows, built with Google Agent Developm
 - Display the complete saved profile and verify changes after each write.
 - Persist profile changes in a local JSON file across restarts.
 - Keep local profile changes separate from LinkedIn account changes.
-- Save, list, retrieve, and mark locally persisted content drafts as reviewed; drafts remain unpublished.
+- Save, list, retrieve, and mark locally persisted content drafts as reviewed; drafts remain unpublished.\n- Save and retrieve company/internship verification reports with evidence links, risk flags, confidence, and a cautious verdict.
 
 ## Technology
 
@@ -82,6 +82,21 @@ The deterministic profile router handles supported, explicitly scoped local prof
 
 The agent should only save details the user explicitly provides or confirms. The update tool changes the local JSON profile only; it does not edit LinkedIn.
 
+### Company and internship research
+
+Research a company or internship before applying. Where browsing is available, verify official company information, opportunity details, independent reputation signals, whether fees are required, whether the business primarily sells training/courses, and whether internship tasks appear concrete. Include evidence links and separate verified facts from unknowns; absence of evidence is not proof of fraud.
+
+Verdicts are risk-based: `worth_applying`, `needs_verification`, `high_risk_avoid`, or `insufficient_evidence`. Reports are saved locally to `data/company-research.json` (gitignored).
+
+Examples:
+
+```text
+Research ABC company and its backend internship. Check whether it is a real internship or course-selling.
+Save this company research report.
+List my saved company research.
+Show company research report <id>.
+```
+
 ### Content drafts
 
 Drafts are stored in `data/drafts.json` (gitignored). Ask the agent to draft a post, then explicitly request saving to persist it. Saved drafts have IDs and `draft` / `reviewed` statuses. Review status is not publishing permission.
@@ -145,7 +160,7 @@ We are deliberately starting with one agent and a small set of explicit tools. S
 - [x] Profile command parser tests
 - [ ] Runtime verification of profile management commands
 - [x] Content drafting and local review workflow
-- [ ] Research and networking workflows
+- [x] Company/internship research report storage and tools\n- [ ] Research and networking workflows
 - [ ] Opportunity and application tracking
 - [ ] LinkedIn OAuth and permitted API integration
 - [ ] Dashboard, observability, and deployment
