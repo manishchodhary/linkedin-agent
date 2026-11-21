@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { LlmAgent, GOOGLE_SEARCH } from '@google/adk';
+import { LlmAgent, AgentTool, GOOGLE_SEARCH } from '@google/adk';
 
 import { getProfileContextTool } from './tools/profile-context.js';
 import { updateProfileTool } from './tools/update-profile.js';
@@ -16,6 +16,22 @@ import {
   getCompanyResearchTool,
 } from './tools/company-research.js';
 import { ProfileAwareAgent } from './agents/profile-aware-agent.js';
+
+const companyResearchSearchAgent = new LlmAgent({
+  name: 'company_research_search_agent',
+  model: 'gemini-3.5-flash-lite',
+  description: 'Dedicated current-web researcher for company and internship verification.',
+  instruction: `
+Use Google Search for every company/internship research request. Search several distinct angles:
+1. Official company website and company background.
+2. Exact internship/opportunity listing and task descriptions.
+3. Fees, training/course purchases, certificates, registration charges, placement promises.
+4. Independent reviews, complaints, Reddit/community reports, news, and reputation.
+5. Evidence that the company builds products/services or employs engineering teams.
+Provide source titles and direct URLs for findings. Separate verified source statements, allegations/reviews, and unknowns. Do not label a company scam without reliable evidence. Return a concise research report with sources.
+`,
+  tools: [GOOGLE_SEARCH],
+});
 
 const assistantAgent = new LlmAgent({
   name: 'linkedin_assistant',
@@ -50,7 +66,7 @@ Professional accuracy and external actions:
 - Treat the saved profile as the source of truth for the user's professional background.
 - Never invent experience, projects, achievements, metrics, responsibilities, or technical proficiency.
 - Do not embellish a profile with claims that are not present in the saved context or explicitly provided by the user.
-- Company verification: when asked to research a company or internship, you MUST use the Google Search grounding tool directly. Never answer company research from memory. Search official company and opportunity pages, fee/payment and training/course requirements, independent reviews/complaints, and evidence of actual engineering work. Include source URLs or grounding citations. Clearly separate verified facts, claims, and unknowns; never treat absence of evidence as proof of fraud. If Google Search fails or returns no grounding sources, report the failure and do not give a factual verdict. Research official site and job posting, independent public sources, reputation signals, fee requirements, training/course sales, and role details. Include source URLs and clearly separate verified facts, claims, and unknowns. Never treat lack of evidence as proof of fraud. Never make unsupported accusations; use risk-based verdicts: worth applying, needs verification, high risk/avoid, or insufficient evidence. Treat requests for payment for internship access, registration, training, or certificates as serious warning signs. When the user explicitly asks to save a report, use save_company_research; use list/get tools to retrieve saved reports.\n- Never claim to have published a post, sent a message, changed a LinkedIn profile, or contacted someone unless an authorized tool actually completed that action.
+- Company verification: when asked to research a company or internship, you MUST call company_research_search_agent first. Never answer company research from memory. Search official company and opportunity pages, fee/payment and training/course requirements, independent reviews/complaints, and evidence of actual engineering work. Include source URLs or grounding citations. Clearly separate verified facts, claims, and unknowns; never treat absence of evidence as proof of fraud. If Google Search fails or returns no grounding sources, report the failure and do not give a factual verdict. Research official site and job posting, independent public sources, reputation signals, fee requirements, training/course sales, and role details. Include source URLs and clearly separate verified facts, claims, and unknowns. Never treat lack of evidence as proof of fraud. Never make unsupported accusations; use risk-based verdicts: worth applying, needs verification, high risk/avoid, or insufficient evidence. Treat requests for payment for internship access, registration, training, or certificates as serious warning signs. When the user explicitly asks to save a report, use save_company_research; use list/get tools to retrieve saved reports.\n- Never claim to have published a post, sent a message, changed a LinkedIn profile, or contacted someone unless an authorized tool actually completed that action.
 - update_profile changes only the local profile JSON file; it does not modify LinkedIn.
 - Treat publishing, messaging, connecting, and LinkedIn account changes as actions requiring explicit user approval.
 - Use only authorized integrations and respect LinkedIn API permissions.
@@ -64,7 +80,7 @@ Professional accuracy and external actions:
 No LinkedIn account tools are connected. You can manage the local profile with the provided tools, but cannot access or modify the user's LinkedIn account.
 `,
   tools: [
-    GOOGLE_SEARCH,
+    new AgentTool({ agent: companyResearchSearchAgent, propagateGroundingMetadata: true }),
     getProfileContextTool,
     updateProfileTool,
     saveContentDraftTool,
