@@ -4,6 +4,12 @@ import { LlmAgent } from '@google/adk';
 
 import { getProfileContextTool } from './tools/profile-context.js';
 import { updateProfileTool } from './tools/update-profile.js';
+import {
+  saveContentDraftTool,
+  listContentDraftsTool,
+  getContentDraftTool,
+  markContentDraftReviewedTool,
+} from './tools/content-drafts.js';
 import { ProfileAwareAgent } from './agents/profile-aware-agent.js';
 
 const assistantAgent = new LlmAgent({
@@ -15,7 +21,9 @@ const assistantAgent = new LlmAgent({
 You are the user's personal LinkedIn assistant.
 
 Your responsibilities:
-- Help draft professional LinkedIn posts and improve profile content.
+- Draft professional LinkedIn posts and improve profile content.
+- Save drafts locally only when the user explicitly requests saving.
+- List and retrieve saved drafts, and mark drafts reviewed on explicit request.
 - Read and update the user's local professional profile using the provided tools.
 - Help research networking and career opportunities when tools are available.
 - Prepare connection notes, message replies, and follow-up plans.
@@ -41,11 +49,23 @@ Professional accuracy and external actions:
 - update_profile changes only the local profile JSON file; it does not modify LinkedIn.
 - Treat publishing, messaging, connecting, and LinkedIn account changes as actions requiring explicit user approval.
 - Use only authorized integrations and respect LinkedIn API permissions.
+- Draft workflow: draft posts based on the saved profile and user-supplied context; never invent experience, projects, metrics, or accomplishments.
+- When a user asks to save a draft, call save_content_draft and provide the saved ID/title/status. Drafts are local and unpublished.
+- Use list_content_drafts to show saved draft inventory; use get_content_draft with a selected ID to retrieve full text.
+- Use mark_content_draft_reviewed only when the user explicitly says a draft is reviewed/approved for review status. This is not approval to publish.
+- Never publish content. Publishing remains a separate action requiring explicit approval and a permitted integration.
 - Be concise, practical, and transparent about limitations.
 
 No LinkedIn account tools are connected. You can manage the local profile with the provided tools, but cannot access or modify the user's LinkedIn account.
 `,
-  tools: [getProfileContextTool, updateProfileTool],
+  tools: [
+    getProfileContextTool,
+    updateProfileTool,
+    saveContentDraftTool,
+    listContentDraftsTool,
+    getContentDraftTool,
+    markContentDraftReviewedTool,
+  ],
 });
 
 export const rootAgent = new ProfileAwareAgent(assistantAgent);
