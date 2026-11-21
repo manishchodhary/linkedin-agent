@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { parseSerperResults } from '../src/research/cli.js';
+import { parseSerperResults, researchQueryPlan } from '../src/research/cli.js';
 
 test('parseSerperResults extracts organic Google results from Serper payload', () => {
   const results = parseSerperResults({
@@ -23,4 +23,10 @@ test('parseSerperResults extracts organic Google results from Serper payload', (
 test('parseSerperResults handles missing organic results', () => {
   assert.deepEqual(parseSerperResults({}), []);
   assert.deepEqual(parseSerperResults(null), []);
+});
+
+test('smart research uses one query while deep research uses three', () => {
+  assert.equal(researchQueryPlan('Acme').length, 1);
+  assert.equal(researchQueryPlan('Acme', true).length, 3);
+  assert.match(researchQueryPlan('Acme')[0], /Acme/);
 });
