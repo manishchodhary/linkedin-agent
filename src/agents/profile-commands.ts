@@ -57,7 +57,7 @@ export function parseProfileCommand(message: string): ProfileCommand | null {
     [
       /\b(?:update|change|set)\s+(?:my\s+)?(?:(?:local|saved)\s+)?(github|portfolio|linkedin)\s+(?:link|url)\s+to\s+(https?:\/\/\S+)/i,
       (value) => {
-        const match = input.match(/\b(?:update|change|set)\s+(?:my\s+)?(github|portfolio|linkedin)\s+(?:link|url)\s+to\s+(https?:\/\/\S+)/i)!;
+        const match = input.match(/\b(?:update|change|set)\s+(?:my\s+)?(?:(?:local|saved)\s+)?(github|portfolio|linkedin)\s+(?:link|url)\s+to\s+(https?:\/\/\S+)/i);\n        if (!match) return null;
         return {
           type: 'set-link',
           field: match[1].toLowerCase() as keyof Profile['links'],
