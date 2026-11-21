@@ -11,6 +11,7 @@ A personal AI assistant for LinkedIn workflows, built with Google Agent Developm
 - Display the complete saved profile and verify changes after each write.
 - Persist profile changes in a local JSON file across restarts.
 - Keep local profile changes separate from LinkedIn account changes.
+- Save, list, retrieve, and mark locally persisted content drafts as reviewed; drafts remain unpublished.
 
 ## Technology
 
@@ -81,6 +82,20 @@ The deterministic profile router handles supported, explicitly scoped local prof
 
 The agent should only save details the user explicitly provides or confirms. The update tool changes the local JSON profile only; it does not edit LinkedIn.
 
+### Content drafts
+
+Drafts are stored in `data/drafts.json` (gitignored). Ask the agent to draft a post, then explicitly request saving to persist it. Saved drafts have IDs and `draft` / `reviewed` statuses. Review status is not publishing permission.
+
+Examples:
+
+```text
+Draft a post about learning backend reliability using my saved profile.
+Save this draft as Backend Reliability Learning.
+List my saved drafts.
+Show draft <id>.
+Mark draft <id> as reviewed.
+```
+
 ## Architecture
 
 ```text
@@ -129,7 +144,7 @@ We are deliberately starting with one agent and a small set of explicit tools. S
 - [x] Deterministic local profile management commands
 - [x] Profile command parser tests
 - [ ] Runtime verification of profile management commands
-- [ ] Content drafting and review workflow
+- [x] Content drafting and local review workflow
 - [ ] Research and networking workflows
 - [ ] Opportunity and application tracking
 - [ ] LinkedIn OAuth and permitted API integration
