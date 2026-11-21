@@ -10,6 +10,14 @@ test('tracker stores opportunities and contacts, prevents duplicates, and update
   const store = await import('../src/data/tracker-store.js');
 
   try {
+    await assert.rejects(
+      store.addOpportunity({ title: 'Invalid URL', company: 'Example Labs', url: 'htpps://google.com' }),
+    );
+
+    await assert.rejects(
+      store.addContact({ name: 'Invalid contact', linkedinUrl: 'not-a-url' }),
+    );
+
     const first = await store.addOpportunity({
       title: 'Backend Intern',
       company: 'Example Labs',
