@@ -1,4 +1,4 @@
-import { BaseAgent, InvocationContext, LlmAgent } from '@google/adk';
+import { BaseAgent, createEvent, InvocationContext, LlmAgent } from '@google/adk';
 import type { Event } from '@google/adk';
 
 import { getProfile, updateProfile } from '../data/profile-store.js';
@@ -148,14 +148,14 @@ export class ProfileAwareAgent extends BaseAgent {
         );
       }
 
-      yield {
+      yield createEvent({
         author: this.name,
         invocationId: context.invocationId,
         content: {
           role: 'model',
           parts: [{ text: results.join('\n\n') }],
         },
-      };
+      });
       return;
     }
 
