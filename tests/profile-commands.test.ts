@@ -43,6 +43,10 @@ test('parses profile display and link updates', () => {
   );
   assert.deepEqual(
     parseProfileCommand('Update my saved GitHub link to https://github.com/example.'),
+  assert.deepEqual(
+    parseProfileCommand('Change my local portfolio URL to https://portfolio.example.'),
+    { type: 'set-link', field: 'portfolio', value: 'https://portfolio.example' },
+  );
     { type: 'set-link', field: 'github', value: 'https://github.com/example' },
   );
 });
