@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "research": "tsx src/research/cli.ts",
-    "match": "tsx src/matching/cli.ts"
+    "match": "tsx src/matching/cli.ts",
+    "tracker": "tsx src/tracker/cli.ts"
   },
   "dependencies": {
     "@google/adk": "^2.5.0",
