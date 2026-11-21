@@ -12,7 +12,8 @@ A personal AI assistant for LinkedIn workflows, built with Google Agent Developm
 - Persist profile changes in a local JSON file across restarts.
 - Keep local profile changes separate from LinkedIn account changes.
 - Save, list, retrieve, and mark locally persisted content drafts as reviewed; drafts remain unpublished.
-- Save and retrieve company/internship verification reports with evidence links, risk flags, confidence, and a cautious verdict.\n- Store job opportunities and contacts locally with duplicate detection, pipeline status, notes, and follow-up dates.
+- Save and retrieve company/internship verification reports with evidence links, risk flags, confidence, and a cautious verdict.
+- Store job opportunities and contacts locally with duplicate detection, pipeline status, notes, and follow-up dates.
 - Standalone direct web search for company research that runs without Gemini quota.
 
 ## Technology
