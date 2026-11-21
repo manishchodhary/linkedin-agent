@@ -29,7 +29,7 @@ export function parseProfileCommand(message: string): ProfileCommand | null {
     return { type: 'show' };
   }
 
-  const linkMatch = input.match(/\\b(?:update|change|set)\\s+(?:my\\s+)?(?:(?:local|saved)\\s+)?(github|portfolio|linkedin)\\s+(?:link|url)\\s+to\\s+(https?:\\/\\/\\S+)/i);
+  const linkMatch = input.match(/\b(?:update|change|set)\s+(?:my\s+)?(?:(?:local|saved)\s+)?(github|portfolio|linkedin)\s+(?:link|url)\s+to\s+(https?:\/\/\S+)/i);
   if (linkMatch) {
     return {
       type: 'set-link',
@@ -63,7 +63,6 @@ export function parseProfileCommand(message: string): ProfileCommand | null {
       /\b(?:remove|delete)\s+(?:the\s+)?target\s+role\s+["“]?(.+?)["”]?\s+from\s+(?:my\s+)?(?:local\s+|saved\s+)?(?:target\s+)?roles\b/i,
       (value) => ({ type: 'remove-role', value: cleanValue(value) }),
     ],
-    [
   ];
 
   for (const [pattern, createCommand] of patterns) {
