@@ -8,3 +8,4 @@ coverage/
 *.log
 /data/profile.json
 /data/*.tmp
+/data/drafts.json
