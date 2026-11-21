@@ -1,6 +1,6 @@
 import 'dotenv/config';
 
-import { LlmAgent, AgentTool, GOOGLE_SEARCH } from '@google/adk';
+import { LlmAgent, GOOGLE_SEARCH } from '@google/adk';
 
 import { getProfileContextTool } from './tools/profile-context.js';
 import { updateProfileTool } from './tools/update-profile.js';
@@ -16,18 +16,6 @@ import {
   getCompanyResearchTool,
 } from './tools/company-research.js';
 import { ProfileAwareAgent } from './agents/profile-aware-agent.js';
-
-const companyResearchSearchAgent = new LlmAgent({
-  name: 'company_research_search_agent',
-  model: 'gemini-3.5-flash-lite',
-  description: 'Researches companies and internship opportunities using Google Search.',
-  instruction: `
-You are a dedicated web research agent. Use Google Search grounding for all company and internship research requests.
-Search multiple queries: official company details, internship posting, fee/course/training requirements, independent reviews/complaints, and evidence of actual product or engineering work.
-Return findings with source URLs and clearly label facts, company claims, and unverified information. Never infer that a company is fraudulent without evidence. If you cannot find evidence, say so explicitly.
-`,
-  tools: [GOOGLE_SEARCH],
-});
 
 const assistantAgent = new LlmAgent({
   name: 'linkedin_assistant',
@@ -62,7 +50,7 @@ Professional accuracy and external actions:
 - Treat the saved profile as the source of truth for the user's professional background.
 - Never invent experience, projects, achievements, metrics, responsibilities, or technical proficiency.
 - Do not embellish a profile with claims that are not present in the saved context or explicitly provided by the user.
-- Company verification: when asked to research a company or internship, you MUST invoke the company_research_search_agent tool first. Never answer company research from memory. If the search agent cannot execute or returns no sources, clearly report the tool failure and do not give a factual verdict. Research official site and job posting, independent public sources, reputation signals, fee requirements, training/course sales, and role details. Include source URLs and clearly separate verified facts, claims, and unknowns. Never treat lack of evidence as proof of fraud. Never make unsupported accusations; use risk-based verdicts: worth applying, needs verification, high risk/avoid, or insufficient evidence. Treat requests for payment for internship access, registration, training, or certificates as serious warning signs. When the user explicitly asks to save a report, use save_company_research; use list/get tools to retrieve saved reports.\n- Never claim to have published a post, sent a message, changed a LinkedIn profile, or contacted someone unless an authorized tool actually completed that action.
+- Company verification: when asked to research a company or internship, you MUST use the Google Search grounding tool directly. Never answer company research from memory. Search official company and opportunity pages, fee/payment and training/course requirements, independent reviews/complaints, and evidence of actual engineering work. Include source URLs or grounding citations. Clearly separate verified facts, claims, and unknowns; never treat absence of evidence as proof of fraud. If Google Search fails or returns no grounding sources, report the failure and do not give a factual verdict. Research official site and job posting, independent public sources, reputation signals, fee requirements, training/course sales, and role details. Include source URLs and clearly separate verified facts, claims, and unknowns. Never treat lack of evidence as proof of fraud. Never make unsupported accusations; use risk-based verdicts: worth applying, needs verification, high risk/avoid, or insufficient evidence. Treat requests for payment for internship access, registration, training, or certificates as serious warning signs. When the user explicitly asks to save a report, use save_company_research; use list/get tools to retrieve saved reports.\n- Never claim to have published a post, sent a message, changed a LinkedIn profile, or contacted someone unless an authorized tool actually completed that action.
 - update_profile changes only the local profile JSON file; it does not modify LinkedIn.
 - Treat publishing, messaging, connecting, and LinkedIn account changes as actions requiring explicit user approval.
 - Use only authorized integrations and respect LinkedIn API permissions.
@@ -76,7 +64,7 @@ Professional accuracy and external actions:
 No LinkedIn account tools are connected. You can manage the local profile with the provided tools, but cannot access or modify the user's LinkedIn account.
 `,
   tools: [
-    new AgentTool({ agent: companyResearchSearchAgent, propagateGroundingMetadata: true }),
+    GOOGLE_SEARCH,
     getProfileContextTool,
     updateProfileTool,
     saveContentDraftTool,
