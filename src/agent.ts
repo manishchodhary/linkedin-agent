@@ -76,6 +76,7 @@ Professional accuracy and external actions:
 No LinkedIn account tools are connected. You can manage the local profile with the provided tools, but cannot access or modify the user's LinkedIn account.
 `,
   tools: [
+    new AgentTool({ agent: companyResearchSearchAgent, propagateGroundingMetadata: true }),
     getProfileContextTool,
     updateProfileTool,
     saveContentDraftTool,
